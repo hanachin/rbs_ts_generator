@@ -1,0 +1,9 @@
+Description:
+    Generate TypeScript routes definition and API request runtime from .rbs
+
+Example:
+    bin/rails generate rbs_ts
+
+    This will create:
+        app/javascript/packs/rbs_ts_routes.ts
+        app/javascript/packs/rbs_ts_runtime.ts
