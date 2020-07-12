@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.authors     = ["Seiei Miyagi"]
   spec.email       = ["hanachin@gmail.com"]
   spec.homepage    = "https://github.com/hanachin/rbs_ts_generator"
-  spec.summary     = "Generate TypeScript routes definition and API request runtime from .rbs"
+  spec.summary     = "Generate TypeScript that includes routes definition and request / response JSON type from type signature of Rails controller actions."
   spec.license     = "MIT"
 
   spec.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
