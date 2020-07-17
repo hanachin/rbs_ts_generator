@@ -90,6 +90,7 @@ using Module.new {
       ApplicationController.subclasses.each do |subclass|
         subclass_type_name = parse_type_name(subclass.inspect).absolute!
         begin
+          binding.pry
           definition = builder.build_instance(subclass_type_name)
         rescue
           e = $!
