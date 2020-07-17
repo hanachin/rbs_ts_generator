@@ -89,7 +89,12 @@ using Module.new {
       types = {}
       ApplicationController.subclasses.each do |subclass|
         subclass_type_name = parse_type_name(subclass.inspect).absolute!
-        definition = builder.build_instance(subclass_type_name)
+        begin
+          definition = builder.build_instance(subclass_type_name)
+        rescue
+          e = $!
+          binding.irb
+        end
         actions = subclass.public_instance_methods(false)
         actions.each do |action|
           method = definition.methods[action]
