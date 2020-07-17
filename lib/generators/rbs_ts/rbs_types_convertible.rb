@@ -1,6 +1,6 @@
 require 'rbs'
 
-unless RBS::Types.constants.sort == [:NoSubst, :EmptyEachType, :Literal, :Bases, :Interface, :Tuple, :Union, :ClassSingleton, :Application, :ClassInstance, :Record, :Function, :Optional, :Variable, :Alias, :Proc, :Intersection, :NoFreeVariables].sort
+unless RBS::Types.constants.sort == [:NoSubst, :NoTypeName, :EmptyEachType, :Literal, :Bases, :Interface, :Tuple, :Union, :ClassSingleton, :Application, :ClassInstance, :Record, :Function, :Optional, :Variable, :Alias, :Proc, :Intersection, :NoFreeVariables].sort
   raise 'Unsupported'
 end
 
