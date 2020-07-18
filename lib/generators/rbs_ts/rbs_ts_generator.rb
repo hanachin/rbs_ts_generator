@@ -77,7 +77,7 @@ using Module.new {
     end
 
     def rbs_env
-      RBS::Environment.from_loader(loader).resolve_type_names
+      RBS::Environment.from_loader(rbs_loader).resolve_type_names
     end
 
     def rbs_builder
