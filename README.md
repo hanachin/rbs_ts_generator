@@ -10,14 +10,14 @@ Write type signature of your controller actions in [ruby/rbs](https://github.com
 
 ```rbs
 # sig/app/controllers/boards_controller.rbs
-class BoardsController < ApplicationController
+class BoardsController < ::ApplicationController
   @board: Board
   @boards: Board::ActiveRecord_Relation
 
   def index: () -> Array[{ id: Integer, title: String }]
-  def create: (String title) -> ({ url: String, message: String } | Array[String])
-  def update: (Integer id, String title) -> ({ url: String, message: String } | Array[String])
-  def destroy: (Integer id) -> { url: String, message: String }
+  def create: (String title) -> { id: Integer, message: String } | Array[String]
+  def update: (Integer id, String title) -> { id: Integer, message: String } | Array[String]
+  def destroy: (Integer id) -> { message: String }
 end
 ```
 
@@ -26,14 +26,14 @@ But action does not explicitly return json record.
 To pass the ruby type checking, add `| void` to each signatures.
 
 ```rbs
-class BoardsController < ApplicationController
+class BoardsController < ::ApplicationController
   @board: Board
   @boards: Board::ActiveRecord_Relation
 
   def index: () -> (Array[{ id: Integer, title: String }] | void)
-  def create: (String title) -> ({ url: String, message: String } | Array[String] | void)
-  def update: (Integer id, String title) -> ({ url: String, message: String } | Array[String] | void)
-  def destroy: (Integer id) -> ({ url: String, message: String } | void)
+  def create: (String title) -> ({ id: Integer, message: String } | Array[String] | void)
+  def update: (Integer id, String title) -> ({ id: Integer, message: String } | Array[String] | void)
+  def destroy: (Integer id) -> ({ message: String } | void)
 end
 ```
 
@@ -52,7 +52,7 @@ end
 
 ```console
 $ bundle exec steep check
-[Steep 0.17.1] [target=app] [target#type_check(target_sources: [app/channels/application_cable/channel.rb, app/channels/application_cable/connection.rb, app/controllers/application_controller.rb, app/controllers/boards_controller.rb, app/helpers/application_helper.rb, app/helpers/boards_helper.rb, app/jobs/application_job.rb, app/mailers/application_mailer.rb, app/models/application_record.rb, app/models/board.rb, app/mailboxes/application_mailbox.rb], validate_signatures: true)] [synthesize:(1:1)] [synthesize:(2:3)] [synthesize:(2:3)] [(*::Symbol, ?model_name: ::string, **untyped) -> void] Method call with rest keywords type is detected. Rough approximation to be improved.
+[Steep 0.20.0] [target=app] [target#type_check(target_sources: [app/channels/application_cable/channel.rb, app/channels/application_cable/connection.rb, app/controllers/application_controller.rb, app/controllers/boards_controller.rb, app/helpers/application_helper.rb, app/helpers/boards_helper.rb, app/jobs/application_job.rb, app/mailboxes/application_mailbox.rb, app/mailers/application_mailer.rb, app/models/application_record.rb, app/models/board.rb], validate_signatures: true)] [synthesize:(1:1)] [synthesize:(2:3)] [synthesize:(2:3)] [(*::Symbol, ?model_name: ::string, **untyped) -> void] Method call with rest keywords type is detected. Rough approximation to be improved.
 ```
 
 When you passed the ruby type check, next generate TypeScript from those signatures.
@@ -112,43 +112,6 @@ export const board = {
 
 And generate default runtime in `app/javascript/packs/rbs_ts_runtime.ts`
 
-```typescript
-type HttpMethods = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'
-type BaseResource = {
-  path: (args: any) => string
-  names: string[]
-  Methods?: any
-  Params?: { [method in HttpMethods]?: any }
-  Return?: { [method in HttpMethods]?: any }
-}
-export async function railsApi<
-  Method extends Exclude<Resource['Methods'], undefined>,
-  Resource extends BaseResource,
-  Params extends Exclude<Resource['Params'], undefined>[Method],
-  Return extends Exclude<Resource['Return'], undefined>[Method]
->(method: Method, { path, names }: Resource, params: Params): Promise<{ status: number, json: Return }> {
-  const tag = document.querySelector<HTMLMetaElement>('meta[name=csrf-token]')
-  const paramsNotInNames = Object.keys(params).reduce<object>((ps, key) => names.indexOf(key) === - 1 ? { ...ps, [key]: params[key] } : ps, {})
-  const searchParams = new URLSearchParams()
-  for (const name of Object.keys(paramsNotInNames)) {
-    searchParams.append(name, paramsNotInNames[name])
-  }
-  const query = method === 'GET' && Object.keys(paramsNotInNames).length ? `?${searchParams.toString()}` : ''
-  const body = method === 'GET' ? undefined : JSON.stringify(paramsNotInNames)
-  const response = await fetch(path(params) + query, {
-    method,
-    body,
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'X-CSRF-Token': tag.content
-    }
-  })
-  const json = await response.json() as Return
-  return new Promise((resolve) => resolve({ status: response.status, json: json }))
-}
-```
-
 In your TypeScript code, you can use those routes definition and the default runtime like following
 
 ```typescript
@@ -156,7 +119,7 @@ import { boards } from './rbs_ts_routes'
 import { railsApi } from './rbs_ts_runtime'
 
 const params = { title: 'test' }
-railsApi('POST' as const, boards, params).then(({ json }) => {
+railsApi('POST', boards, params).then(({ json }) => {
   if (json instanceof Array) {
     return Promise.reject(json)
   } else {
