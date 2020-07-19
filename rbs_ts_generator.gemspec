@@ -3,7 +3,7 @@ $:.push File.expand_path("lib", __dir__)
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
   spec.name        = "rbs_ts_generator"
-  spec.version     = '0.1.0'
+  spec.version     = '0.2.0'
   spec.authors     = ["Seiei Miyagi"]
   spec.email       = ["hanachin@gmail.com"]
   spec.homepage    = "https://github.com/hanachin/rbs_ts_generator"
