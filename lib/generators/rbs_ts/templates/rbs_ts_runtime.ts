@@ -2,7 +2,7 @@ type HttpMethods = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'
 type BaseResource = {
   path: (args: any) => string
   names: string[]
-  Methods?: any
+  Methods?: HttpMethods
   Params?: { [method in HttpMethods]?: any }
   Return?: { [method in HttpMethods]?: any }
 }
