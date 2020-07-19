@@ -9,9 +9,8 @@ type BaseResource = {
 export async function railsApi<
   Method extends Exclude<Resource['Methods'], undefined>,
   Resource extends BaseResource,
-  Params extends Exclude<Resource['Params'], undefined>[Method],
   Return extends Exclude<Resource['Return'], undefined>[Method]
->(method: Method, { path, names }: Resource, params: Params): Promise<{ status: number, json: Return }> {
+>(method: Method, { path, names }: Resource, params: Exclude<Resource['Params'], undefined>[Method]): Promise<{ status: number, json: Return }> {
   const tag = document.querySelector<HTMLMetaElement>('meta[name=csrf-token]')
   const paramsNotInNames = Object.keys(params).reduce<object>((ps, key) => names.indexOf(key) === - 1 ? { ...ps, [key]: params[key] } : ps, {})
   const searchParams = new URLSearchParams()
